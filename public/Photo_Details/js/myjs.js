@@ -1,5 +1,15 @@
-      
-function showDetails() {
+function getPhoto(){
+	let name = document.getElementById("nameSelect");
+	if(name.value != ""){
+		if(confirm("Are you sure ?")==true){
+			showDetails();
+			console.log("working");
+		}else{
+			return;
+		}
+	}
+}
+function showDetails() {	
     let name = document.getElementById("nameSelect").value;
 
     let photo = document.getElementById("photo");
@@ -22,7 +32,7 @@ function showDetails() {
         "bill_gates": "images/bill_gates.jpg",
         "steve_jobs": "images/steve_jobs.jpg",
         "elon_musk": "images/elon_musk.jpg",
-        "zukerberg": "images/zukerberg.jpg",
+        "zukerberg": "images/zuckerberg.jpeg",
         "linus_torvalds": "images/linus_torvalds.jpeg",
         "tim_berner": "images/tim_berner.jpg",
         "Sundar_Pichai": "images/Sundar_Pichai.jpg",
@@ -66,6 +76,16 @@ function showDetails() {
         photo.classList.add("photo-james");
 		photo.classList.add("photo-james-blue");
     }
+	
 }
 
-        
+function offDetails() {
+	let name = document.getElementById("nameSelect");
+
+    let photo = document.getElementById("photo");
+    let info = document.getElementById("infoText");
+	
+	name.value = "";
+	photo.style.display = "none";
+	info.innerHTML = "Please select a person from the dropdown.";
+}

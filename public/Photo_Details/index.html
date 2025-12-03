@@ -9,7 +9,7 @@
 
     <h2>Select a Name to Display Photo & Info</h2>   
     <!-- Dropdown -->
-    <select id="nameSelect" onchange="showDetails()" style='height:40px; width:320px;'>
+    <select id="nameSelect"  style='height:40px; width:320px;'>
         <option value="">-- Select Name --</option>
 
         <!-- Earlier personalities -->
@@ -33,6 +33,10 @@
         <option value="AdaLovelace">Ada Lovelace (1st Programmer)</option>
         <option value="madhu">Madhu (JFS Trainer, CDC, IARE Hyderabad)</option>
     </select>
+
+	<button onclick="getPhoto()">OK</button>
+	
+	<button onclick="offDetails()">CANCEL</button>
 
     <div class="container">
 
