@@ -4,26 +4,93 @@
     <title>Batch-wise Timetable</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
-    <style>
-        table {
-            width: 80%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background: lightblue;
-        }
-        .batch-title {
-            font-weight: bold;
-            font-size: 20px;
-            margin-top: 30px;
-        }
-    </style>
+	<style>
+		body {
+			font-family: "Segoe UI", Arial, sans-serif;
+			background-color: #f4f6f9;
+			padding: 20px;
+		}
+	
+		h2 {
+			color: #2c3e50;
+			margin-bottom: 10px;
+		}
+	
+		input[type="file"] {
+			padding: 8px;
+			margin-bottom: 20px;
+			border: 1px solid #ccc;
+			border-radius: 6px;
+			background: #fff;
+		}
+	
+		table {
+			width: 100%;
+			max-width: 900px;
+			border-collapse: collapse;
+			margin: 15px 0;
+			background: white;
+			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+			border-radius: 8px;
+			overflow: hidden;
+		}
+	
+		th, td {
+			border: 1px solid #dcdcdc;
+			padding: 10px;
+			text-align: center;
+			font-size: 14px;
+		}
+	
+		th {
+			background: linear-gradient(135deg, #6fb1fc, #4364f7);
+			color: white;
+			font-weight: 600;
+			letter-spacing: 0.5px;
+		}
+	
+		td {
+			background-color: #fafafa;
+		}
+	
+		tr:nth-child(even) td {
+			background-color: #f1f5fb;
+		}
+	
+		tr:hover td {
+			background-color: #e9f2ff;
+			transition: background 0.2s ease-in-out;
+		}
+	
+		.batch-title {
+			font-weight: 600;
+			font-size: 22px;
+			margin: 25px 0 10px;
+			color: #34495e;
+		}
+	
+		button {
+			padding: 8px 14px;
+			font-size: 14px;
+			border: none;
+			border-radius: 6px;
+			cursor: pointer;
+			background: #4364f7;
+			color: white;
+			margin-bottom: 10px;
+			transition: background 0.2s ease, transform 0.1s ease;
+		}
+	
+		button:hover {
+			background: #2b4de0;
+			transform: translateY(-1px);
+		}
+	
+		button:active {
+			transform: translateY(0);
+		}
+	</style>
+	
 </head>
 <body>
 
@@ -149,38 +216,7 @@ function printTable(batch) {
     printWindow.print();
 }
 
-/*
-function buildTables(timetable) 
-{
-    const container = document.getElementById("tables");
-    container.innerHTML = "";
 
-    const days = ["MON", "TUE", "WED", "THU", "FRI", "SAT"];
-
-    for (const batch in timetable) 
-	{
-        const table = document.createElement("table");
-
-        const title = document.createElement("div");
-        title.className = "batch-title";
-        title.innerHTML = `Batch: ${batch}`;
-        container.appendChild(title);
-        let html = "<tr><th>DAY</th><th>FN</th><th rowspan=7>L<br>U<br>N<br>C<br>H</th><th>AN</th></tr>";
-        days.forEach(day => {
-            const fn = timetable[batch][day]?.FN || "";
-            const an = timetable[batch][day]?.AN || "";
-            html += `
-                <tr>
-                    <td>${day}</td>
-                    <td>${fn}</td>
-                    <td>${an}</td>
-                </tr>
-            `;
-        });
-        table.innerHTML = html;
-        container.appendChild(table);
-    }
-}*/
 </script>
 
 </body>
