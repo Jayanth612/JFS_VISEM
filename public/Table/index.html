@@ -1,230 +1,247 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <title>Faculty Timetable Viewer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
-	<head>
-		<title>Batch-wise Timetable</title>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+		body {
+			font-family: "Segoe UI", Arial, sans-serif;
+			background: #f4f6fb;
+			color: #2c3e50;
+			padding: 20px;
+			body-align : center;
+		}
 	
-		<style>
-			body {
-				font-family: "Segoe UI", Arial, sans-serif;
-				background-color: #f4f6f9;
-				padding: 20px;
-			}
-		
-			h2 {
-				color: #2c3e50;
-				margin-bottom: 10px;
-			}
-		
-			input[type="file"] {
-				padding: 8px;
-				margin-bottom: 20px;
-				border: 1px solid #ccc;
-				border-radius: 6px;
-				background: #fff;
-			}
-		
-			table {
-				width: 100%;
-				max-width: 900px;
-				border-collapse: collapse;
-				margin: 15px 0;
-				background: white;
-				box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-				border-radius: 8px;
-				overflow: hidden;
-			}
-		
-			th, td {
-				border: 1px solid #dcdcdc;
-				padding: 10px;
-				text-align: center;
-				font-size: 14px;
-			}
-		
-			th {
-				background: linear-gradient(135deg, #6fb1fc, #4364f7);
-				color: white;
-				font-weight: 600;
-				letter-spacing: 0.5px;
-			}
-		
-			td {
-				background-color: #fafafa;
-			}
-		
-			tr:nth-child(even) td {
-				background-color: #f1f5fb;
-			}
-		
-			tr:hover td {
-				background-color: #e9f2ff;
-				transition: background 0.2s ease-in-out;
-			}
-		
-			.batch-title {
-				font-weight: 600;
-				font-size: 22px;
-				margin: 25px 0 10px;
-				color: #34495e;
-			}
-		
-			button {
-				padding: 8px 14px;
-				font-size: 14px;
-				border: none;
-				border-radius: 6px;
-				cursor: pointer;
-				background: #4364f7;
-				color: white;
-				margin-bottom: 10px;
-				transition: background 0.2s ease, transform 0.1s ease;
-			}
-		
-			button:hover {
-				background: #2b4de0;
-				transform: translateY(-1px);
-			}
-		
-			button:active {
-				transform: translateY(0);
-			}
-		</style>
-	</head>
+		h2 {
+			font-size: 26px;
+			margin-bottom: 10px;
+			color: #1f2d3d;
+		}
 	
-	<body>
+		/* Inputs and Select */
+		input[type="file"],
+		input[type="text"],
+		select {
+			padding: 8px 12px;
+			margin-right: 10px;
+			margin-top: 10px;
+			border: 1px solid #cfd6e0;
+			border-radius: 6px;
+			font-size: 14px;
+			background: #ffffff;
+			transition: border-color 0.2s ease, box-shadow 0.2s ease;
+		}
 	
-		<h2>Upload CSV File</h2>
-		<input type="file" id="csvFile" accept=".csv">
-		<label>
-			Employee:
-			<input type="text" id="empId" placeholder="Enter Employee">
-		</label>
-		
-		
-		<div id="tables"></div>
-		
-		<script>
-			document.getElementById("csvFile").addEventListener("change", function () {
-				Papa.parse(this.files[0], {
-					header: true,
-					skipEmptyLines: true,
-					complete: function (result) {
-						processCSV(result.data);
-					}
-				});
-			});
-			
-			document.getElementById("empId").addEventListener("input", () => {
-				document.getElementById("csvFile").dispatchEvent(new Event("change"));
-			});
-				
-			function processCSV(data) {
-				const timetable = {};
-				const batchFaculty = {}; 
-			
-				data.forEach(row => {
-					const batch = row["BATCH"];
-					const day = row["DAY"];
-					const session = row["SESSION"];
-					const course = row["COURSE"];
-					const room = row["ROOM"];
-					const faculty = row["FACULTY"]?.trim().toUpperCase();
-			
-					if (!batch || !day || !session) return;
-			
-					if (!timetable[batch]) {
-						timetable[batch] = {};
-						batchFaculty[batch] = new Set(); 
-					}
-			
-					batchFaculty[batch].add(faculty); 
-			
-					if (!timetable[batch][day]) {
-						timetable[batch][day] = { FN: "", AN: "" };
-					}
-			
-					timetable[batch][day][session] =
-						`${course}<br>Room: ${room}<br>Faculty: ${faculty}`;
-				});
-			
-				buildTables(timetable, batchFaculty);
-			}
-			function buildTables(timetable, batchFaculty) {
-				const container = document.getElementById("tables");
-				container.innerHTML = "";
-			
-				const empId = document.getElementById("empId").value.trim();
-				const facultyInput = empId.trim().toUpperCase();
-				const days = ["MON", "TUE", "WED", "THU", "FRI", "SAT"];
-			
-				for (const batch in timetable) {
-					if (facultyInput && !batchFaculty[batch].has(facultyInput)) {
-						continue;
-					}
-			
-					const wrapper = document.createElement("div");
-			
-					const title = document.createElement("div");
-					title.className = "batch-title";
-					title.innerHTML = `Batch: ${batch}`;
-			
-					const btn = document.createElement("button");
-					btn.innerHTML = "Print This Timetable";
-					btn.onclick = () => printTable(batch);
-			
-					const table = document.createElement("table");
-					table.id = `table_${batch}`;
-			
-					let html =
-						"<tr><th>DAY</th><th>FN</th><th rowspan='7'>L<br>U<br>N<br>C<br>H</th><th>AN</th></tr>";
-			
-					days.forEach(day => {
-						const fn = timetable[batch][day]?.FN || "";
-						const an = timetable[batch][day]?.AN || "";
-						html += `
-							<tr>
-								<td>${day}</td>
-								<td>${fn}</td>
-								<td>${an}</td>
-							</tr>
-						`;
-					});
-			
-					table.innerHTML = html;
-					wrapper.append(title, btn, table);
-					container.appendChild(wrapper);
-				}
-			}
-			
-			function printTable(batch) {
-				const tableHTML = document.getElementById(`table_${batch}`).outerHTML;
-				const title = `<h2>Batch: ${batch}</h2>`;
-			
-				const printWindow = window.open("", "", "width=900,height=600");
-				printWindow.document.write(`
-					<html>
-					<head>
-						<title>Print</title>
-						<style>
-							table { width: 100%; border-collapse: collapse; }
-							th, td { border: 1px solid black; padding: 8px; text-align: center; }
-							th { background: lightblue; }
-						</style>
-					</head>
-					<body>
-						${title}
-						${tableHTML}
-					</body>
-					</html>
-				`);
-			
-				printWindow.document.close();
-				printWindow.print();
-			}
-		</script>
-		
-	</body>
+		input[type="text"]:focus,
+		select:focus,
+		input[type="file"]:focus {
+			outline: none;
+			border-color: #4f7cff;
+			box-shadow: 0 0 0 2px rgba(79, 124, 255, 0.15);
+		}
 	
+		/* Faculty title */
+		.title {
+			font-weight: 600;
+			font-size: 22px;
+			margin: 30px 0 10px;
+			color: #34495e;
+		}
+	
+		/* Table styling */
+		table {
+			width: 100%;
+			max-width: 900px;
+			border-collapse: collapse;
+			margin: 15px 0 30px;
+			background: #ffffff;
+			border-radius: 10px;
+			overflow: hidden;
+			box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+		}
+	
+		th, td {
+			border: 1px solid #e0e6ef;
+			padding: 10px 12px;
+			text-align: center;
+			font-size: 14px;
+			line-height: 1.4;
+		}
+	
+		th {
+			background: linear-gradient(135deg, #6fa8ff, #4f7cff);
+			color: #ffffff;
+			font-weight: 600;
+			letter-spacing: 0.4px;
+		}
+	
+		td {
+			background: #fafbfd;
+		}
+	
+		/* Day column */
+		td:first-child {
+			font-weight: 600;
+			background: #f1f4fa;
+			color: #2c3e50;
+		}
+	
+		/* Zebra rows */
+		tr:nth-child(even) td {
+			background: #f7f9fd;
+		}
+	
+		/* Hover effect */
+		tr:hover td {
+			background: #eef3ff;
+			transition: background 0.2s ease-in-out;
+		}
+	
+		/* Highlighted SU batch */
+		.highlight-su {
+			background: #fff2b3;
+			border-left: 4px solid #f4c430;
+			padding: 4px;
+			font-weight: 600;
+			border-radius: 4px;
+		}
+	</style>
+	
+</head>
+
+<body>
+
+<h2>Faculty Timetable</h2>
+
+<input type="file" id="csvFile" accept=".csv">
+
+<br><br>
+
+<input type="text" id="facultySearch" placeholder="Search faculty...">
+<select id="facultySelect">
+    <option value="">Select Faculty</option>
+</select>
+
+<div id="tables"></div>
+
+<script>
+let facultyTT = {};
+
+document.getElementById("csvFile").addEventListener("change", function () {
+    Papa.parse(this.files[0], {
+        header: true,
+        skipEmptyLines: true,
+        complete: function (result) {
+            facultyTT = buildFacultyData(result.data);
+            populateFacultyDropdown(facultyTT);
+        }
+    });
+});
+
+function buildFacultyData(data) {
+    const tt = {};
+
+    data.forEach(row => {
+        const faculty = row["FACULTY"];
+        const day = row["DAY"];
+        const session = row["SESSION"]; 
+        const batch = row["BATCH"];
+        const course = row["COURSE"];
+        const room = row["ROOM"];
+
+        if (!faculty || !day || !session) return;
+
+        if (!tt[faculty]) {
+            tt[faculty] = {};
+        }
+
+        if (!tt[faculty][day]) {
+            tt[faculty][day] = { FN: "", AN: "" };
+        }
+
+        let content =
+			batch + "<br>" +
+			course + "<br>" +
+				"Room: " + room;
+
+		if (batch.toUpperCase().includes("VI-SU-B2")) {
+			content = `<div class="highlight-su">${content}</div>`;
+		}
+		tt[faculty][day][session] = content;
+    });
+
+    return tt;
+}
+
+function populateFacultyDropdown(tt) {
+    const select = document.getElementById("facultySelect");
+    select.innerHTML = '<option value="">Select Faculty</option>';
+
+    Object.keys(tt).sort().forEach(faculty => {
+        const opt = document.createElement("option");
+        opt.value = faculty;
+        opt.textContent = faculty;
+        select.appendChild(opt);
+    });
+}
+
+document.getElementById("facultySearch").addEventListener("input", function () {
+    const query = this.value.toLowerCase();
+    const select = document.getElementById("facultySelect");
+
+    Array.from(select.options).forEach(opt => {
+        if (!opt.value) return;
+        opt.style.display = opt.value.toLowerCase().includes(query) ? "" : "none";
+    });
+});
+
+document.getElementById("facultySelect").addEventListener("change", function () {
+    const faculty = this.value;
+    if (!faculty) return;
+    buildFacultyTable(faculty);
+});
+
+function buildFacultyTable(faculty) {
+
+    const container = document.getElementById("tables");
+    container.innerHTML = "";
+
+    const days = ["MON", "TUE", "WED", "THU", "FRI", "SAT"];
+    const data = facultyTT[faculty];
+
+    const title = document.createElement("div");
+    title.className = "title";
+    title.innerHTML = "Faculty: " + faculty;
+
+    const table = document.createElement("table");
+
+    let html =
+        "<tr>" +
+        "<th>DAY</th>" +
+        "<th>FN</th>" +
+        "<th rowspan='7'>L<br>U<br>N<br>C<br>H</th>" +
+        "<th>AN</th>" +
+        "</tr>";
+
+    days.forEach(day => {
+        const fn = data[day]?.FN || "";
+        const an = data[day]?.AN || "";
+
+        html +=
+            "<tr>" +
+            "<td>" + day + "</td>" +
+            "<td>" + fn + "</td>" +
+            "<td>" + an + "</td>" +
+            "</tr>";
+    });
+
+    table.innerHTML = html;
+
+    container.appendChild(title);
+    container.appendChild(table);
+}
+</script>
+
+</body>
 </html>
